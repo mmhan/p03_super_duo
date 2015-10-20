@@ -32,6 +32,10 @@
                 android:value=".MainActivity" />
         </activity>
 
+        <activity
+            android:label="ScannerActivity"
+            android:name=".SimpleScannerActivity">
+        </activity>
 
 
         <provider
