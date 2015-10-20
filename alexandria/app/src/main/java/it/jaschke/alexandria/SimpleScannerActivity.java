@@ -11,6 +11,7 @@ import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
 /**
  * Created by mmhan on 20/10/15.
+ * Referencing https://github.com/dm77/barcodescanner
  */
 public class SimpleScannerActivity extends Activity implements ZXingScannerView.ResultHandler {
     private static final String TAG = SimpleScannerActivity.class.getName();
