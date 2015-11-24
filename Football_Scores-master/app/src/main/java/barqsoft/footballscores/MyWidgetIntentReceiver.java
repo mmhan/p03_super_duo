@@ -21,8 +21,12 @@ public class MyWidgetIntentReceiver extends BroadcastReceiver {
                 R.layout.widget_layout);
 
         // updating view
-        remoteViews.setTextViewText(R.id.title, getTitle());
-        remoteViews.setTextViewText(R.id.desc, getDesc(context));
+        remoteViews.setTextViewText(R.id.home_name, "Home Team");
+        remoteViews.setTextViewText(R.id.away_name, "Away Team");
+        remoteViews.setTextViewText(R.id.data_textview, "2015-11-18");
+        remoteViews.setTextViewText(R.id.score_textview, "2-4");
+        remoteViews.setImageViewResource(R.id.home_crest, R.drawable.arsenal);
+        remoteViews.setImageViewResource(R.id.away_crest, R.drawable.chelsea);
 
         // re-registering for click listener
         remoteViews.setOnClickPendingIntent(R.id.sync_button,

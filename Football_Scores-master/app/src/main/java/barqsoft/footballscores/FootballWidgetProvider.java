@@ -22,8 +22,12 @@ public class FootballWidgetProvider extends android.appwidget.AppWidgetProvider 
                 buildButtonPendingIntent(context));
 
         // updating view with initial data
-        remoteViews.setTextViewText(R.id.title, getTitle());
-        remoteViews.setTextViewText(R.id.desc, getDesc());
+        remoteViews.setTextViewText(R.id.home_name, "Home Team");
+        remoteViews.setTextViewText(R.id.away_name, "Away Team");
+        remoteViews.setTextViewText(R.id.data_textview, "2015-11-18");
+        remoteViews.setTextViewText(R.id.score_textview, "2-4");
+        remoteViews.setImageViewResource(R.id.home_crest, R.drawable.arsenal);
+        remoteViews.setImageViewResource(R.id.away_crest, R.drawable.chelsea);
 
         // request for widget update
         pushWidgetUpdate(context, remoteViews);
