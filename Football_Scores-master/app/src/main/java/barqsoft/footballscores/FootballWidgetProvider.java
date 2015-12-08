@@ -7,6 +7,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -28,10 +29,21 @@ public class FootballWidgetProvider extends android.appwidget.AppWidgetProvider 
             remoteViews.setRemoteAdapter(appWidgetIds[i], R.id.listView, intent);
             remoteViews.setOnClickPendingIntent(R.id.sync_button,
                     buildButtonPendingIntent(context));
+            try {
+                buildButtonPendingIntent(context).send();
+            } catch (PendingIntent.CanceledException e) {
+                e.printStackTrace();
+            }
 
-            appWidgetManager.updateAppWidget(appWidgetIds[i],remoteViews);
+            appWidgetManager.updateAppWidget(appWidgetIds[i], remoteViews);
         }
         super.onUpdate(context, appWidgetManager, appWidgetIds);
+    }
+
+    @Override
+    public void onAppWidgetOptionsChanged(Context context, AppWidgetManager appWidgetManager, int appWidgetId, Bundle newOptions) {
+        super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions);
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.listView);
     }
 
     @Override
@@ -46,18 +58,11 @@ public class FootballWidgetProvider extends android.appwidget.AppWidgetProvider 
         super.onReceive(context, intent);
     }
 
-        public static PendingIntent buildButtonPendingIntent(Context context) {
+    public static PendingIntent buildButtonPendingIntent(Context context) {
         // initiate widget update request
         Intent intent = new Intent(context,FootballWidgetProvider.class);
         intent.setAction(WidgetUtils.WIDGET_UPDATE_ACTION);
         return PendingIntent.getBroadcast(context, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
     }
-//
-//    public static void pushWidgetUpdate(Context context, RemoteViews remoteViews) {
-//        ComponentName myWidget = new ComponentName(context,
-//                FootballWidgetProvider.class);
-//        AppWidgetManager manager = AppWidgetManager.getInstance(context);
-//        manager.updateAppWidget(myWidget, remoteViews);
-//    }
 }
