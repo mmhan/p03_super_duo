@@ -7,6 +7,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import barqsoft.footballscores.service.FootballWidgetService;
@@ -28,35 +29,35 @@ public class FootballWidgetProvider extends android.appwidget.AppWidgetProvider 
             remoteViews.setOnClickPendingIntent(R.id.sync_button,
                     buildButtonPendingIntent(context));
 
-            // request for widget update
-            pushWidgetUpdate(context, remoteViews);
+            appWidgetManager.updateAppWidget(appWidgetIds[i],remoteViews);
         }
-
-
-//        // register for button event
-
-//        // updating view with initial data
-//        remoteViews.setTextViewText(R.id.home_name, "Home Team");
-//        remoteViews.setTextViewText(R.id.away_name, "Away Team");
-//        remoteViews.setTextViewText(R.id.data_textview, "2015-11-18");
-//        remoteViews.setTextViewText(R.id.score_textview, "2-4");
-//        remoteViews.setImageViewResource(R.id.home_crest, R.drawable.arsenal);
-//        remoteViews.setImageViewResource(R.id.away_crest, R.drawable.chelsea);
         super.onUpdate(context, appWidgetManager, appWidgetIds);
     }
 
-    public static PendingIntent buildButtonPendingIntent(Context context) {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        final String action = intent.getAction();
+        if(action.equals(WidgetUtils.WIDGET_UPDATE_ACTION)){
+            Log.e(FootballWidgetProvider.class.getName(),"in onReceive of required class");
+            final AppWidgetManager mgr = AppWidgetManager.getInstance(context);
+            final ComponentName cn = new ComponentName(context, FootballWidgetProvider.class);
+            mgr.notifyAppWidgetViewDataChanged(mgr.getAppWidgetIds(cn), R.id.listView);
+        }
+        super.onReceive(context, intent);
+    }
+
+        public static PendingIntent buildButtonPendingIntent(Context context) {
         // initiate widget update request
-        Intent intent = new Intent();
+        Intent intent = new Intent(context,FootballWidgetProvider.class);
         intent.setAction(WidgetUtils.WIDGET_UPDATE_ACTION);
         return PendingIntent.getBroadcast(context, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
     }
-
-    public static void pushWidgetUpdate(Context context, RemoteViews remoteViews) {
-        ComponentName myWidget = new ComponentName(context,
-                FootballWidgetProvider.class);
-        AppWidgetManager manager = AppWidgetManager.getInstance(context);
-        manager.updateAppWidget(myWidget, remoteViews);
-    }
+//
+//    public static void pushWidgetUpdate(Context context, RemoteViews remoteViews) {
+//        ComponentName myWidget = new ComponentName(context,
+//                FootballWidgetProvider.class);
+//        AppWidgetManager manager = AppWidgetManager.getInstance(context);
+//        manager.updateAppWidget(myWidget, remoteViews);
+//    }
 }

@@ -6,7 +6,8 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
-import android.util.Log;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -23,32 +24,25 @@ import barqsoft.footballscores.ScoreData;
  */
 public class StackRemoteViewFactory implements RemoteViewsService.RemoteViewsFactory,
         Loader.OnLoadCompleteListener<Cursor> {
-
-    public static String LOG_TAG = StackRemoteViewFactory.class.getName();
-
     Context mContext;
-
     ArrayList<ScoreData> arrayList;
-    private int mAppWidgetId;
-    private int CURSOR_LOADER = 0;
+    int mAppWidgetId;
+    int CURSOR_LOADER = 0;
     Loader<Cursor> mLoader;
-
     public StackRemoteViewFactory(Context context, Intent intent) {
         mContext = context;
         arrayList = new ArrayList<>();
-
         mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
                 AppWidgetManager.INVALID_APPWIDGET_ID);
     }
-
     @Override
     public void onCreate() {
         startLoading();
     }
-
     public void startLoading() {
         String[] today = new String[1];
-        Date dateNow = new Date(System.currentTimeMillis() - 1000 * 60 * 60 * 24);
+//        Date dateNow = new Date(System.currentTimeMillis() - 1000 * 60 * 60 * 24);
+        Date dateNow = new Date(System.currentTimeMillis());
         SimpleDateFormat mformat = new SimpleDateFormat("yyyy-MM-dd");
         today[0] = mformat.format(dateNow);
         mLoader = new CursorLoader(mContext, DatabaseContract.scores_table.buildScoreWithDate(),
@@ -56,11 +50,31 @@ public class StackRemoteViewFactory implements RemoteViewsService.RemoteViewsFac
         mLoader.registerListener(CURSOR_LOADER, this);
         mLoader.startLoading();
     }
-
     @Override
     public void onDataSetChanged() {
-    }
+        if(mLoader != null){
+            mLoader.reset();
+            Thread thread = new Thread() {
+                public void run() {
+                    Looper.prepare();
 
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            // Do Work
+                            startLoading();
+                            handler.removeCallbacks(this);
+                            Looper.myLooper().quit();
+                        }
+                    }, 2000);
+
+                    Looper.loop();
+                }
+            };
+            thread.start();
+        }
+    }
     @Override
     public void onDestroy() {
     }
@@ -79,9 +93,10 @@ public class StackRemoteViewFactory implements RemoteViewsService.RemoteViewsFac
         rv.setTextViewText(R.id.away_name, scoreData.mAway);
         rv.setTextViewText(R.id.score_textview, scoreData.mHomeGoals + " - " + scoreData.mAwayGoals);
         rv.setTextViewText(R.id.data_textview, scoreData.mMatchTime);
+        rv.setImageViewResource(R.id.home_crest,scoreData.home_crest);
+        rv.setImageViewResource(R.id.away_crest,scoreData.away_crest);
         return rv;
     }
-
     @Override
     public RemoteViews getLoadingView() {
         return null;
@@ -104,15 +119,11 @@ public class StackRemoteViewFactory implements RemoteViewsService.RemoteViewsFac
 
     @Override
     public void onLoadComplete(Loader<Cursor> loader, Cursor cursor) {
-        int i = 0;
         cursor.moveToFirst();
-        Log.e(LOG_TAG, "in onLoadComplete");
+        arrayList.clear();
         while(!cursor.isAfterLast()){
-            i++;
             arrayList.add(new ScoreData(cursor));
             cursor.moveToNext();
         }
     }
-
-
 }

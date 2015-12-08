@@ -7,6 +7,7 @@ import android.database.Cursor;
  */
 public class ScoreData {
     public String mHome, mAway, mHomeGoals, mAwayGoals, mDate, mLeague, mMatchDay, mId, mMatchTime;
+    public int home_crest,away_crest;
     public ScoreData(Cursor cursor) {
         mHome = cursor.getString(scoresAdapter.COL_HOME);
         mAway = cursor.getString(scoresAdapter.COL_AWAY);
@@ -17,5 +18,7 @@ public class ScoreData {
         mMatchDay = cursor.getString(scoresAdapter.COL_MATCHDAY);
         mId = cursor.getString(scoresAdapter.COL_ID);
         mMatchTime = cursor.getString(scoresAdapter.COL_MATCHTIME);
+        home_crest = Utilies.getTeamCrestByTeamName(cursor.getString(scoresAdapter.COL_HOME));
+        away_crest = Utilies.getTeamCrestByTeamName(cursor.getString(scoresAdapter.COL_AWAY));
     }
 }
